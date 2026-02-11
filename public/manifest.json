@@ -1,0 +1,20 @@
+{
+  "short_name": "Patnos Store",
+  "name": "Patnos Dijital Mağaza",
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/seyfettinizm/patnos-store/main/public/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://raw.githubusercontent.com/seyfettinizm/patnos-store/main/public/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#000000"
+}
