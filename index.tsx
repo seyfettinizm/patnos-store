@@ -224,4 +224,4 @@ const App = () => {
 // Kodun HTML'e bağlanmasını sağlayan kritik 2 satır
 const rootElement = document.getElementById('root');
 const root = ReactDOM.createRoot(rootElement);
-root.render(<App />);
+root.render(<App />); 
