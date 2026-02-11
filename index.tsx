@@ -1,21 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import { createClient } from '@supabase/supabase-js';
-import { Settings, Plus, X, Search, LayoutGrid, Download, Trash2, Image as ImageIcon, Sparkles } from 'lucide-react';
+import { Settings, Plus, Search, LayoutGrid, Download, Trash2, Image as ImageIcon, Sparkles } from 'lucide-react';
 
 const supabase = createClient(
   'https://docdtizfqeolqwwfaiyi.supabase.co', 
   'sb_publishable_0TzP8UOehq9blzjKfAQULQ_3zxLCE80'
 );
 
-// Her kutu için rastgele seçilecek renkli temalar
 const cardThemes = [
-  { bg: 'linear-gradient(135deg, #FF3CAC 0%, #784BA0 50%, #2B86C5 100%)', text: '#fff' }, // Gece Mavisi - Pembe
-  { bg: 'linear-gradient(135deg, #0093E9 0%, #80D0C7 100%)', text: '#fff' }, // Turkuaz - Mavi
-  { bg: 'linear-gradient(135deg, #85FFBD 0%, #FFFB7D 100%)', text: '#000' }, // Limon - Yeşil
-  { bg: 'linear-gradient(135deg, #FBAB7E 0%, #F7CE68 100%)', text: '#000' }, // Gün Batımı
-  { bg: 'linear-gradient(135deg, #8BC6EC 0%, #9599E2 100%)', text: '#fff' }, // Lavanta
-  { bg: 'linear-gradient(135deg, #FF9A8B 0%, #FF6A88 55%, #FF99AC 100%)', text: '#fff' } // Rose
+  { bg: 'linear-gradient(135deg, #FF3CAC 0%, #784BA0 50%, #2B86C5 100%)', text: '#fff' },
+  { bg: 'linear-gradient(135deg, #0093E9 0%, #80D0C7 100%)', text: '#fff' },
+  { bg: 'linear-gradient(135deg, #85FFBD 0%, #FFFB7D 100%)', text: '#000' },
+  { bg: 'linear-gradient(135deg, #FBAB7E 0%, #F7CE68 100%)', text: '#000' },
+  { bg: 'linear-gradient(135deg, #8BC6EC 0%, #9599E2 100%)', text: '#fff' },
+  { bg: 'linear-gradient(135deg, #FF9A8B 0%, #FF6A88 55%, #FF99AC 100%)', text: '#fff' }
 ];
 
 const App = () => {
@@ -53,8 +52,6 @@ const App = () => {
 
   return (
     <div style={{ background: '#0a0a0a', color: '#fff', minHeight: '100vh', fontFamily: 'sans-serif' }}>
-      
-      {/* Üst Menü */}
       <nav style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(15px)', borderBottom: '1px solid #1a1a1a', position: 'sticky', top: 0, zIndex: 100 }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 20px', height: '70px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
@@ -77,8 +74,6 @@ const App = () => {
       </nav>
 
       <main style={{ maxWidth: '1100px', margin: '0 auto', padding: '50px 20px' }}>
-        
-        {/* Kahraman Bölümü */}
         <div style={{ textAlign: 'center', marginBottom: '60px' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: '#111', padding: '5px 15px', borderRadius: '20px', color: 'orange', fontSize: '12px', marginBottom: '20px', border: '1px solid #222' }}>
             <Sparkles size={14} /> Dijital Gelecek Burada
@@ -91,7 +86,6 @@ const App = () => {
           </p>
         </div>
 
-        {/* Arama */}
         <div style={{ display: 'flex', gap: '15px', marginBottom: '40px' }}>
           <div style={{ position: 'relative', flex: 1 }}>
             <Search style={{ position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)', color: '#444' }} size={22} />
@@ -100,20 +94,18 @@ const App = () => {
           {isAdmin && <button onClick={() => setShowAddModal(true)} style={{ background: 'orange', padding: '0 25px', borderRadius: '20px', border: 'none', cursor: 'pointer' }}><Plus color="#000" /></button>}
         </div>
 
-        {/* Uygulama Kartları */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '25px' }}>
           {apps.filter(a => a.name.toLowerCase().includes(searchTerm.toLowerCase())).map((app, i) => {
             const theme = cardThemes[i % cardThemes.length];
             return (
-              <div key={i} style={{ background: theme.bg, padding: '30px', borderRadius: '35px', color: theme.text, display: 'flex', flexDirection: 'column', minHeight: '300px', boxShadow: '0 10px 30px rgba(0,0,0,0.3)', position: 'relative' }}>
+              <div key={i} style={{ background: theme.bg, padding: '30px', borderRadius: '35px', color: theme.text, display: 'flex', flexDirection: 'column', minHeight: '300px', boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}>
                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '30px' }}>
-                    <img src={app.icon_url} style={{ width: '70px', height: '70px', borderRadius: '20px', objectFit: 'cover', boxShadow: '0 5px 15px rgba(0,0,0,0.2)', background: '#fff' }} alt={app.name} />
+                    {/* Çerçevesiz ve şeffaf ikon yapısı */}
+                    <img src={app.icon_url} style={{ width: '70px', height: '70px', objectFit: 'contain', filter: 'drop-shadow(0 5px 10px rgba(0,0,0,0.2))' }} alt={app.name} />
                     {isAdmin && <button onClick={() => syncAll(apps.filter(x => x.name !== app.name), storeLogo)} style={{ color: theme.text, opacity: 0.6, background: 'none', border: 'none', cursor: 'pointer' }}><Trash2 size={22}/></button>}
                  </div>
-                 
                  <h3 style={{ fontSize: '22px', fontWeight: '800', marginBottom: '10px' }}>{app.name}</h3>
                  <p style={{ opacity: 0.8, fontSize: '14px', marginBottom: '30px', flex: 1 }}>{app.description}</p>
-                 
                  <a href={app.url} target="_blank" rel="noreferrer" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(10px)', color: theme.text, padding: '15px', borderRadius: '18px', fontWeight: 'bold', border: '1px solid rgba(255,255,255,0.1)' }}>
                    HEMEN AÇ / YÜKLE
                  </a>
@@ -123,7 +115,7 @@ const App = () => {
         </div>
       </main>
 
-      {/* MODALLAR */}
+      {/* MODALLAR (Logo Ayarları, Giriş ve Ekleme) */}
       {showSettingsModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.95)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
           <div style={{ background: '#111', padding: '30px', borderRadius: '30px', width: '100%', maxWidth: '400px', border: '1px solid #222' }}>
