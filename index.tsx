@@ -74,6 +74,7 @@ const App = () => {
       </nav>
 
       <main style={{ maxWidth: '1100px', margin: '0 auto', padding: '50px 20px' }}>
+        {/* Karşılama Notu Geri Geldi */}
         <div style={{ textAlign: 'center', marginBottom: '60px' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: '#111', padding: '5px 15px', borderRadius: '20px', color: 'orange', fontSize: '12px', marginBottom: '20px', border: '1px solid #222' }}>
             <Sparkles size={14} /> Dijital Gelecek Burada
@@ -81,8 +82,8 @@ const App = () => {
           <h2 style={{ fontSize: '48px', fontWeight: '900', marginBottom: '20px' }}>
             Patnos <span style={{ color: 'orange' }}>Dijital Arşivi</span>
           </h2>
-          <p style={{ color: '#777', fontSize: '18px', maxWidth: '650px', margin: '0 auto', lineHeight: '1.6' }}>
-            "Geçmişin köklü mirasını, geleceğin dijital dünyasıyla buluşturuyoruz."
+          <p style={{ color: '#aaa', fontSize: '18px', maxWidth: '700px', margin: '0 auto', lineHeight: '1.8', fontStyle: 'italic' }}>
+            "Geçmişin köklü mirasını, geleceğin dijital dünyasıyla buluşturuyoruz. İzmir Patnoslular Derneği'ne ait tüm projeler ve kültürel hazineler artık tek bir dokunuşla cebinizde."
           </p>
         </div>
 
@@ -100,8 +101,8 @@ const App = () => {
             return (
               <div key={i} style={{ background: theme.bg, padding: '30px', borderRadius: '35px', color: theme.text, display: 'flex', flexDirection: 'column', minHeight: '300px', boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}>
                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '30px' }}>
-                    {/* Çerçevesiz ve şeffaf ikon yapısı */}
-                    <img src={app.icon_url} style={{ width: '70px', height: '70px', objectFit: 'contain', filter: 'drop-shadow(0 5px 10px rgba(0,0,0,0.2))' }} alt={app.name} />
+                    {/* Tamamen Şeffaf ve Çerçevesiz İkonlar */}
+                    <img src={app.icon_url} style={{ width: '75px', height: '75px', objectFit: 'contain', background: 'transparent' }} alt={app.name} />
                     {isAdmin && <button onClick={() => syncAll(apps.filter(x => x.name !== app.name), storeLogo)} style={{ color: theme.text, opacity: 0.6, background: 'none', border: 'none', cursor: 'pointer' }}><Trash2 size={22}/></button>}
                  </div>
                  <h3 style={{ fontSize: '22px', fontWeight: '800', marginBottom: '10px' }}>{app.name}</h3>
@@ -115,7 +116,7 @@ const App = () => {
         </div>
       </main>
 
-      {/* MODALLAR (Logo Ayarları, Giriş ve Ekleme) */}
+      {/* MODALLAR (Admin, Ayarlar ve Ekleme) */}
       {showSettingsModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.95)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
           <div style={{ background: '#111', padding: '30px', borderRadius: '30px', width: '100%', maxWidth: '400px', border: '1px solid #222' }}>
