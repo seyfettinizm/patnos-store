@@ -2,26 +2,31 @@ import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import { createClient } from '@supabase/supabase-js';
 import { 
-  Music, 
   ExternalLink, 
   Settings, 
   Plus, 
   X, 
   Search, 
   LayoutGrid,
-  Info
+  Info,
+  Download
 } from 'lucide-react';
 
-// Mağaza Uygulaması Bileşeni
+// Supabase Bağlantısı (Müzik kutusuyla aynı DB, güvenli bağlantı)
+const supabase = createClient(
+  'https://docdtizfqeolqwwfaiyi.supabase.co', 
+  'sb_publishable_0TzP8UOehq9blzjKfAQULQ_3zxLCE80'
+);
+
 const App = () => {
-  const [apps, setApps] = useState([]);
+  const [apps, setApps] = useState<any[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAdminModal, setShowAdminModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [password, setPassword] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Yeni uygulama formu için state
+  // Yeni uygulama formu
   const [newApp, setNewApp] = useState({
     name: '',
     description: '',
@@ -29,8 +34,23 @@ const App = () => {
     icon_url: ''
   });
 
-  // Şifre kontrolü
-  const handleAdminLogin = (e) => {
+  useEffect(() => {
+    loadApps();
+  }, []);
+
+  const loadApps = async () => {
+    const { data } = await supabase.from('settings').select('value').eq('id', 'store_data').single();
+    if (data?.value) {
+      setApps(data.value.apps || []);
+    }
+  };
+
+  const syncStore = async (updatedApps: any[]) => {
+    await supabase.from('settings').update({ value: { apps: updatedApps } }).eq('id', 'store_data');
+    setApps(updatedApps);
+  };
+
+  const handleAdminLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (password === 'Mihriban04') {
       setIsAdmin(true);
@@ -41,51 +61,71 @@ const App = () => {
     }
   };
 
+  const handleAddApp = () => {
+    if (!newApp.name || !newApp.url) {
+      alert("Lütfen isim ve URL alanlarını doldurun!");
+      return;
+    }
+    const updated = [newApp, ...apps];
+    syncStore(updated);
+    setShowAddModal(false);
+    setNewApp({ name: '', description: '', url: '', icon_url: '' });
+  };
+
+  const deleteApp = (name: string) => {
+    if (confirm(`${name} silinsin mi?`)) {
+      const updated = apps.filter(a => a.name !== name);
+      syncStore(updated);
+    }
+  };
+
   const filteredApps = apps.filter(app => 
     app.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white font-sans">
-      {/* Üst Menü */}
-      <nav className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="bg-blue-600 p-2 rounded-lg">
+    <div style={{ background: '#000', color: '#fff', minHeight: '100vh', fontFamily: 'sans-serif' }}>
+      
+      {/* 📱 Üst Menü (Turuncu Detaylı) */}
+      <nav style={{ borderBottom: '1px solid #1a1a1a', background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', position: 'sticky', top: 0, zIndex: 100 }}>
+        <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '0 20px', height: '70px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ background: 'orange', padding: '8px', borderRadius: '12px', color: '#000' }}>
               <LayoutGrid size={24} />
             </div>
-            <h1 className="text-xl font-bold tracking-tight">Patnos Store</h1>
+            <h1 style={{ fontSize: '20px', fontWeight: 'bold', letterSpacing: '1px' }}>PATNOS STORE</h1>
           </div>
           
           <button 
             onClick={() => isAdmin ? setIsAdmin(false) : setShowAdminModal(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800 hover:bg-slate-700 transition-colors text-sm"
+            style={{ background: '#111', color: isAdmin ? 'orange' : '#555', border: '1px solid #222', padding: '8px 16px', borderRadius: '20px', fontSize: '13px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
           >
-            <Settings size={18} />
+            <Settings size={16} />
             {isAdmin ? 'Yönetimden Çık' : 'Yönetim'}
           </button>
         </div>
       </nav>
 
-      {/* Ana İçerik */}
-      <main className="max-w-6xl mx-auto px-4 py-8">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-extrabold mb-4 bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
+      <main style={{ maxWidth: '1000px', margin: '0 auto', padding: '40px 20px' }}>
+        
+        {/* Karşılama Bölümü */}
+        <div style={{ textAlign: 'center', marginBottom: '50px' }}>
+          <h2 style={{ fontSize: '36px', fontWeight: '900', marginBottom: '15px', background: 'linear-gradient(to right, #fff, orange)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
             Patnos Dijital Arşivi
           </h2>
-          <p className="text-slate-400 max-w-2xl mx-auto">
-            Derneğimize ait tüm uygulama ve projelere buradan güvenle ulaşabilirsiniz.
+          <p style={{ color: '#666', fontSize: '16px', maxWidth: '600px', margin: '0 auto', lineHeight: '1.6' }}>
+            İzmir Patnoslular Derneği'ne ait tüm dijital projelere ve mobil uygulamalara buradan güvenle ulaşabilirsiniz.
           </p>
         </div>
 
-        {/* Arama ve Ekleme */}
-        <div className="flex flex-col md:flex-row gap-4 mb-8">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
+        {/* Arama ve Yeni Ekleme */}
+        <div style={{ display: 'flex', gap: '15px', marginBottom: '30px', flexWrap: 'wrap' }}>
+          <div style={{ position: 'relative', flex: 1, minWidth: '280px' }}>
+            <Search style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)', color: '#444' }} size={20} />
             <input 
               type="text"
               placeholder="Uygulama ara..."
-              className="w-full bg-slate-800 border border-slate-700 rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+              style={{ width: '100%', background: '#080808', border: '1px solid #1a1a1a', padding: '15px 15px 15px 45px', borderRadius: '15px', color: '#fff', fontSize: '16px', outline: 'none' }}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -93,43 +133,51 @@ const App = () => {
           {isAdmin && (
             <button 
               onClick={() => setShowAddModal(true)}
-              className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl flex items-center justify-center gap-2 font-semibold transition-all shadow-lg shadow-blue-900/20"
+              style={{ background: 'orange', color: '#000', padding: '0 25px', borderRadius: '15px', fontWeight: 'bold', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', height: '54px' }}
             >
-              <Plus size={20} />
-              Yeni Uygulama Ekle
+              <Plus size={20} /> Yeni Uygulama
             </button>
           )}
         </div>
 
-        {/* Uygulama Listesi */}
+        {/* Uygulama Kartları */}
         {filteredApps.length === 0 ? (
-          <div className="text-center py-20 bg-slate-800/30 rounded-3xl border-2 border-dashed border-slate-700">
-            <Info className="mx-auto mb-4 text-slate-600" size={48} />
-            <p className="text-slate-500">Henüz uygulama eklenmedi. Yönetici olarak giriş yapıp ilk uygulamayı ekleyin.</p>
+          <div style={{ textAlign: 'center', padding: '60px', border: '2px dashed #111', borderRadius: '30px' }}>
+            <Info size={48} style={{ color: '#222', marginBottom: '15px' }} />
+            <p style={{ color: '#444' }}>Henüz bir uygulama eklenmedi.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
             {filteredApps.map((app, index) => (
-              <a 
+              <div 
                 key={index}
-                href={app.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group bg-slate-800/50 border border-slate-700 p-6 rounded-2xl hover:bg-slate-800 hover:border-blue-500/50 transition-all hover:-translate-y-1"
+                style={{ background: '#080808', border: '1px solid #111', padding: '25px', borderRadius: '24px', position: 'relative', transition: 'transform 0.2s' }}
               >
-                <div className="flex justify-between items-start mb-4">
-                  <div className="w-14 h-14 bg-slate-700 rounded-xl flex items-center justify-center overflow-hidden border border-slate-600 group-hover:border-blue-500/50">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+                  <div style={{ width: '60px', height: '60px', background: '#111', borderRadius: '16px', overflow: 'hidden', border: '1px solid #222' }}>
                     {app.icon_url ? (
-                      <img src={app.icon_url} alt={app.name} className="w-full h-full object-cover" />
+                      <img src={app.icon_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     ) : (
-                      <Music className="text-blue-400" size={28} />
+                      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'orange' }}><LayoutGrid /></div>
                     )}
                   </div>
-                  <ExternalLink className="text-slate-600 group-hover:text-blue-400 transition-colors" size={20} />
+                  {isAdmin && (
+                    <button onClick={() => deleteApp(app.name)} style={{ background: 'none', border: 'none', color: '#ff4444', cursor: 'pointer' }}><X size={20}/></button>
+                  )}
                 </div>
-                <h3 className="text-lg font-bold mb-2 group-hover:text-blue-400 transition-colors">{app.name}</h3>
-                <p className="text-slate-400 text-sm line-clamp-2">{app.description}</p>
-              </a>
+
+                <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '8px', color: 'orange' }}>{app.name}</h3>
+                <p style={{ color: '#555', fontSize: '14px', marginBottom: '25px', height: '40px', overflow: 'hidden' }}>{app.description}</p>
+                
+                <a 
+                  href={app.url} 
+                  target="_blank" 
+                  rel="noreferrer"
+                  style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', background: '#fff', color: '#000', padding: '12px', borderRadius: '12px', fontWeight: 'bold', fontSize: '14px' }}
+                >
+                  <Download size={18} /> HEMEN YÜKLE / AÇ
+                </a>
+              </div>
             ))}
           </div>
         )}
@@ -137,83 +185,36 @@ const App = () => {
 
       {/* Şifre Modalı */}
       {showAdminModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-800 border border-slate-700 p-8 rounded-3xl w-full max-w-md relative">
-            <button onClick={() => setShowAdminModal(false)} className="absolute right-6 top-6 text-slate-500 hover:text-white">
-              <X size={24} />
-            </button>
-            <h3 className="text-2xl font-bold mb-6">Yönetici Girişi</h3>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
+          <div style={{ background: '#111', padding: '40px', borderRadius: '30px', width: '100%', maxWidth: '400px', border: '1px solid #222' }}>
+            <h3 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '25px', textAlign: 'center' }}>Yönetici Girişi</h3>
             <form onSubmit={handleAdminLogin}>
               <input 
                 type="password"
-                placeholder="Şifrenizi yazın..."
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl py-4 px-4 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Şifre..."
+                style={{ width: '100%', background: '#000', border: '1px solid #222', padding: '15px', borderRadius: '12px', color: '#fff', marginBottom: '15px' }}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoFocus
               />
-              <button className="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-xl font-bold transition-all shadow-lg shadow-blue-900/40">
-                Giriş Yap
-              </button>
+              <button style={{ width: '100%', background: 'orange', border: 'none', padding: '15px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>GİRİŞ YAP</button>
+              <button type="button" onClick={() => setShowAdminModal(false)} style={{ width: '100%', background: 'none', border: 'none', color: '#444', marginTop: '15px', cursor: 'pointer' }}>İptal</button>
             </form>
           </div>
         </div>
       )}
 
-      {/* Yeni Uygulama Modalı */}
+      {/* Uygulama Ekleme Modalı */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-800 border border-slate-700 p-8 rounded-3xl w-full max-w-lg relative">
-            <button onClick={() => setShowAddModal(false)} className="absolute right-6 top-6 text-slate-500 hover:text-white">
-              <X size={24} />
-            </button>
-            <h3 className="text-2xl font-bold mb-6">Yeni Uygulama Kaydı</h3>
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm text-slate-400 mb-1 block">Uygulama Adı</label>
-                <input 
-                  type="text" 
-                  placeholder="Örn: Patnos Müzik"
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  onChange={(e) => setNewApp({...newApp, name: e.target.value})}
-                />
-              </div>
-              <div>
-                <label className="text-sm text-slate-400 mb-1 block">Açıklama</label>
-                <textarea 
-                  placeholder="Kısaca uygulamanın amacını yazın..."
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl py-3 px-4 h-24 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  onChange={(e) => setNewApp({...newApp, description: e.target.value})}
-                ></textarea>
-              </div>
-              <div>
-                <label className="text-sm text-slate-400 mb-1 block">Uygulama Linki (URL)</label>
-                <input 
-                  type="text" 
-                  placeholder="https://..."
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  onChange={(e) => setNewApp({...newApp, url: e.target.value})}
-                />
-              </div>
-              <div>
-                <label className="text-sm text-slate-400 mb-1 block">İkon URL (Opsiyonel)</label>
-                <input 
-                  type="text" 
-                  placeholder="Logo linkini buraya yapıştırın"
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  onChange={(e) => setNewApp({...newApp, icon_url: e.target.value})}
-                />
-              </div>
-              <button 
-                onClick={() => {
-                  setApps([...apps, newApp]);
-                  setShowAddModal(false);
-                }}
-                className="w-full bg-emerald-600 hover:bg-emerald-500 py-4 rounded-xl font-bold transition-all shadow-lg shadow-emerald-900/40 mt-4"
-              >
-                MAĞAZAYA EKLE
-              </button>
-            </div>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
+          <div style={{ background: '#111', padding: '30px', borderRadius: '30px', width: '100%', maxWidth: '500px', border: '1px solid #222' }}>
+            <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '20px' }}>Yeni Uygulama Kaydı</h3>
+            <input placeholder="Uygulama Adı" style={inputStyle} onChange={e => setNewApp({...newApp, name: e.target.value})} />
+            <textarea placeholder="Kısa Açıklama" style={{...inputStyle, height: '80px'}} onChange={e => setNewApp({...newApp, description: e.target.value})} />
+            <input placeholder="Uygulama Linki (URL)" style={inputStyle} onChange={e => setNewApp({...newApp, url: e.target.value})} />
+            <input placeholder="İkon URL" style={inputStyle} onChange={e => setNewApp({...newApp, icon_url: e.target.value})} />
+            <button onClick={handleAddApp} style={{ width: '100%', background: 'orange', border: 'none', padding: '15px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer', marginTop: '10px' }}>MAĞAZAYA EKLE</button>
+            <button onClick={() => setShowAddModal(false)} style={{ width: '100%', background: 'none', border: 'none', color: '#444', marginTop: '10px', cursor: 'pointer' }}>Kapat</button>
           </div>
         </div>
       )}
@@ -221,7 +222,10 @@ const App = () => {
   );
 };
 
-// Kodun HTML'e bağlanmasını sağlayan kritik 2 satır
+const inputStyle = { width: '100%', background: '#000', border: '1px solid #222', padding: '12px', borderRadius: '10px', color: '#fff', marginBottom: '10px', outline: 'none' };
+
 const rootElement = document.getElementById('root');
-const root = ReactDOM.createRoot(rootElement);
-root.render(<App />); 
+if (rootElement) {
+  const root = ReactDOM.createRoot(rootElement);
+  root.render(<App />);
+}
