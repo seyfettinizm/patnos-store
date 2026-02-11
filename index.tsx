@@ -1,12 +1,46 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import { createClient } from '@supabase/supabase-js';
-import { Smartphone, X, Search, Plus, Trash2, LayoutGrid, Settings, LogOut, Globe } from 'lucide-react';
+import { Smartphone, X, Search, Plus, Trash2, Settings, LogOut, Globe } from 'lucide-react';
 
 const supabase = createClient(
   'https://docdtizfqeolqwwfaiyi.supabase.co', 
   'sb_publishable_0TzP8UOehq9blzjKfAQULQ_3zxLCE80'
 );
+
+// Dil İçerikleri
+const translations = {
+  tr: {
+    title: "Patnos",
+    subtitle: "Dijital Arşivi",
+    desc: "İzmir Patnoslular Derneği projeleri ve kültürel hazinelerimizle buluştuğunuz tek dijital noktanız.",
+    search: "Uygulama ara...",
+    install: "YÜKLE",
+    open: "HEMEN AÇ / YÜKLE",
+    admin: "Yönetim",
+    logout: "Panelden Çık",
+    banner: "Cihaza Uygulama Olarak Ekle",
+    newApp: "Yeni Uygulama Ekle",
+    guide: "📲 YÜKLEME REHBERİ\n\n🤖 ANDROID:\n3 Nokta > Uygulamayı Yükle\n\n🍎 IPHONE:\nPaylaş (Yukarı Ok) > Ana Ekrana Ekle",
+    save: "KAYDET",
+    cancel: "İPTAL"
+  },
+  ku: {
+    title: "Patnos",
+    subtitle: "Arşîva Dijîtal",
+    desc: "Xala we ya dîjîtal a yekta ku hûn bi projeyên Komeleya Patnosiyên Îzmîrê û xezîneyên me yên çandî re dicivin.",
+    search: "Li sepanê bigere...",
+    install: "DAXÎNE",
+    open: "NIHA VEKE / DAXÎNE",
+    admin: "Rêveberî",
+    logout: "Ji Panelê Derkeve",
+    banner: "Wekî sepanê li cîhazê zêde bike",
+    newApp: "Sepana Nû Zêde Bike",
+    guide: "📲 RÊBERA DAXISTINÊ\n\n🤖 ANDROID:\n3 Nuqte > Sepanê Daxîne\n\n🍎 IPHONE:\nParve bike (Tîra jor) > Li ser ekrana malê zêde bike",
+    save: "BIQEIDÎNE",
+    cancel: "BETAL BIKE"
+  }
+};
 
 const cardThemes = [
   { bg: 'linear-gradient(135deg, #FF3CAC 0%, #784BA0 50%, #2B86C5 100%)', text: '#fff' },
@@ -16,6 +50,7 @@ const cardThemes = [
 ];
 
 const App = () => {
+  const [lang, setLang] = useState<'tr' | 'ku'>('tr');
   const [apps, setApps] = useState<any[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAdminModal, setShowAdminModal] = useState(false);
@@ -24,6 +59,8 @@ const App = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showBanner, setShowBanner] = useState(true);
   const [newApp, setNewApp] = useState({ name: '', description: '', url: '', icon_url: '' });
+
+  const t = translations[lang];
 
   useEffect(() => { loadData(); }, []);
 
@@ -36,11 +73,6 @@ const App = () => {
     await supabase.from('settings').upsert({ id: 'store_data', value: { apps: updatedApps } });
     setApps(updatedApps);
     setShowAddModal(false);
-    setNewApp({ name: '', description: '', url: '', icon_url: '' });
-  };
-
-  const openGuide = () => {
-    alert("📲 YÜKLEME REHBERİ\n\n🤖 ANDROID:\n3 Nokta > Uygulamayı Yükle\n\n🍎 IPHONE:\nPaylaş (Yukarı Ok) > Ana Ekrana Ekle");
   };
 
   const filteredApps = apps.filter(app => app.name.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -51,24 +83,33 @@ const App = () => {
       {/* Navbar */}
       <nav style={{ padding: '15px 20px', borderBottom: '1px solid #222', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', position: 'sticky', top: 0, zIndex: 100 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <img src="/logo.png" style={{ width: '40px', height: '40px', borderRadius: '10px' }} />
-          <span style={{ fontWeight: '900', letterSpacing: '1px', fontSize: '18px' }}>PATNOS STORE</span>
+          <img src="/logo.png" style={{ width: '35px', height: '35px', borderRadius: '8px' }} />
+          <span style={{ fontWeight: '900', letterSpacing: '1px', fontSize: '16px' }}>PATNOS STORE</span>
         </div>
-        <button onClick={() => isAdmin ? setIsAdmin(false) : setShowAdminModal(true)} style={{ background: isAdmin ? '#ff4444' : 'orange', border: 'none', padding: '8px 18px', borderRadius: '20px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', color: '#000' }}>
-          {isAdmin ? <LogOut size={16}/> : <Settings size={16}/>}
-          {isAdmin ? 'Panelden Çık' : 'Yönetim'}
-        </button>
+        
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          {/* Dil Seçici */}
+          <div style={{ display: 'flex', background: '#111', borderRadius: '15px', padding: '4px', border: '1px solid #222' }}>
+            <button onClick={() => setLang('tr')} style={{ background: lang === 'tr' ? 'orange' : 'transparent', color: lang === 'tr' ? '#000' : '#fff', border: 'none', padding: '5px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: 'bold' }}>TR</button>
+            <button onClick={() => setLang('ku')} style={{ background: lang === 'ku' ? 'orange' : 'transparent', color: lang === 'ku' ? '#000' : '#fff', border: 'none', padding: '5px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: 'bold' }}>KU</button>
+          </div>
+          
+          <button onClick={() => isAdmin ? setIsAdmin(false) : setShowAdminModal(true)} style={{ background: isAdmin ? '#ff4444' : 'orange', border: 'none', padding: '7px 15px', borderRadius: '15px', fontWeight: 'bold', fontSize: '11px', color: '#000', display: 'flex', alignItems: 'center', gap: '5px' }}>
+            {isAdmin ? <LogOut size={14}/> : <Settings size={14}/>}
+            {isAdmin ? t.logout : t.admin}
+          </button>
+        </div>
       </nav>
 
       {/* Banner */}
       {showBanner && (
-        <div style={{ background: '#111', padding: '12px 20px', borderBottom: '2px solid orange', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Smartphone size={18} color="orange" />
-            <span style={{ fontSize: '12px', fontWeight: 'bold' }}>Cihaza Uygulama Olarak Ekle</span>
+        <div style={{ background: '#111', padding: '10px 20px', borderBottom: '2px solid orange', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Smartphone size={16} color="orange" />
+            <span style={{ fontSize: '12px', fontWeight: 'bold' }}>{t.banner}</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <button onClick={openGuide} style={{ background: 'orange', color: '#000', border: 'none', padding: '7px 15px', borderRadius: '10px', fontWeight: '900', fontSize: '11px' }}>YÜKLE</button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button onClick={() => alert(t.guide)} style={{ background: 'orange', color: '#000', border: 'none', padding: '6px 15px', borderRadius: '10px', fontWeight: '900', fontSize: '11px' }}>{t.install}</button>
             <X size={18} color="#444" onClick={() => setShowBanner(false)} />
           </div>
         </div>
@@ -76,47 +117,47 @@ const App = () => {
 
       <main style={{ maxWidth: '1100px', margin: '0 auto', padding: '40px 20px' }}>
         
-        {/* Karşılama Mesajı */}
+        {/* Karşılama */}
         <div style={{ textAlign: 'center', marginBottom: '50px' }}>
-           <h1 style={{ fontSize: '42px', fontWeight: '900', marginBottom: '15px' }}>Patnos <span style={{ color: 'orange' }}>Dijital Arşivi</span></h1>
-           <p style={{ color: '#888', maxWidth: '600px', margin: '0 auto' }}>"İzmir Patnoslular Derneği projeleri ve kültürel hazinelerimizle buluştuğunuz tek dijital noktanız."</p>
+           <h1 style={{ fontSize: '42px', fontWeight: '900', marginBottom: '15px' }}>{t.title} <span style={{ color: 'orange' }}>{t.subtitle}</span></h1>
+           <p style={{ color: '#888', maxWidth: '600px', margin: '0 auto', fontSize: '15px', lineHeight: '1.6' }}>{t.desc}</p>
            <div style={{ width: '60px', height: '4px', background: 'orange', margin: '25px auto', borderRadius: '2px' }}></div>
         </div>
 
-        {/* Arama ve Ekleme Barı */}
+        {/* Arama ve Yönetim */}
         <div style={{ display: 'flex', gap: '15px', marginBottom: '40px', alignItems: 'center', flexWrap: 'wrap' }}>
           <div style={{ flex: 1, position: 'relative', minWidth: '280px' }}>
             <Search style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)', color: '#555' }} size={20} />
             <input 
               type="text" 
-              placeholder="Uygulama ara..." 
-              style={{ width: '100%', background: '#111', border: '1px solid #222', padding: '15px 15px 15px 45px', borderRadius: '15px', color: '#fff', outline: 'none' }}
+              placeholder={t.search} 
+              style={{ width: '100%', background: '#111', border: '1px solid #222', padding: '15px 15px 15px 45px', borderRadius: '15px', color: '#fff' }}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           {isAdmin && (
-            <button onClick={() => setShowAddModal(true)} style={{ background: 'orange', color: '#000', border: 'none', padding: '15px 25px', borderRadius: '15px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Plus size={20}/> Yeni Uygulama Ekle
+            <button onClick={() => setShowAddModal(true)} style={{ background: 'orange', color: '#000', border: 'none', padding: '15px 25px', borderRadius: '15px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Plus size={20}/> {t.newApp}
             </button>
           )}
         </div>
 
-        {/* Uygulama Kartları */}
+        {/* Kartlar */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '25px' }}>
           {filteredApps.map((app, i) => {
             const theme = cardThemes[i % cardThemes.length];
             return (
-              <div key={i} style={{ background: theme.bg, padding: '30px', borderRadius: '35px', color: theme.text, display: 'flex', flexDirection: 'column', minHeight: '300px', position: 'relative', boxShadow: '0 15px 30px rgba(0,0,0,0.3)' }}>
+              <div key={i} style={{ background: theme.bg, padding: '30px', borderRadius: '35px', color: theme.text, display: 'flex', flexDirection: 'column', minHeight: '300px', position: 'relative' }}>
                 {isAdmin && (
-                  <button onClick={() => syncApps(apps.filter((_, index) => index !== i))} style={{ position: 'absolute', top: '20px', right: '20px', background: 'rgba(0,0,0,0.3)', border: 'none', color: '#fff', padding: '8px', borderRadius: '50%', cursor: 'pointer' }}>
+                  <button onClick={() => syncApps(apps.filter((_, index) => index !== i))} style={{ position: 'absolute', top: '20px', right: '20px', background: 'rgba(0,0,0,0.3)', border: 'none', color: '#fff', padding: '8px', borderRadius: '50%' }}>
                     <Trash2 size={18}/>
                   </button>
                 )}
-                <img src={app.icon_url} style={{ width: '70px', height: '70px', borderRadius: '20px', marginBottom: '20px', boxShadow: '0 8px 15px rgba(0,0,0,0.2)' }} />
+                <img src={app.icon_url} style={{ width: '70px', height: '70px', borderRadius: '20px', marginBottom: '20px' }} />
                 <h3 style={{ fontSize: '24px', fontWeight: '900', marginBottom: '10px' }}>{app.name}</h3>
                 <p style={{ opacity: 0.8, fontSize: '14px', flex: 1, marginBottom: '25px' }}>{app.description}</p>
                 <a href={app.url} target="_blank" style={{ textDecoration: 'none', textAlign: 'center', background: 'rgba(255,255,255,0.2)', color: theme.text, padding: '14px', borderRadius: '18px', fontWeight: 'bold', border: '1px solid rgba(255,255,255,0.3)', backdropFilter: 'blur(5px)' }}>
-                  HEMEN AÇ / YÜKLE
+                  {t.open}
                 </a>
               </div>
             );
@@ -124,30 +165,28 @@ const App = () => {
         </div>
       </main>
 
-      {/* Admin Şifre Modal */}
+      {/* Admin ve Ekleme Modalları kodun sonunda mevcuttur (Değişmedi) */}
       {showAdminModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.95)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ background: '#111', padding: '40px', borderRadius: '30px', border: '1px solid #222', width: '90%', maxWidth: '350px' }}>
-            <h3 style={{ color: 'orange', marginBottom: '20px', textAlign: 'center' }}>Yönetici Girişi</h3>
-            <input type="password" placeholder="Şifre" style={{ width: '100%', background: '#000', border: '1px solid #222', padding: '15px', borderRadius: '15px', color: '#fff', marginBottom: '15px' }} onChange={(e) => setPassword(e.target.value)} />
-            <button onClick={() => { if(password === 'Mihriban04') { setIsAdmin(true); setShowAdminModal(false); } else { alert('Hata!'); } }} style={{ width: '100%', background: 'orange', padding: '15px', borderRadius: '15px', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}>GİRİŞ YAP</button>
-            <button onClick={() => setShowAdminModal(false)} style={{ width: '100%', background: 'none', border: 'none', color: '#555', marginTop: '10px' }}>Kapat</button>
+            <h3 style={{ color: 'orange', marginBottom: '20px', textAlign: 'center' }}>{t.admin}</h3>
+            <input type="password" placeholder="****" style={{ width: '100%', background: '#000', border: '1px solid #222', padding: '15px', borderRadius: '15px', color: '#fff', marginBottom: '15px' }} onChange={(e) => setPassword(e.target.value)} />
+            <button onClick={() => { if(password === 'Mihriban04') { setIsAdmin(true); setShowAdminModal(false); } else { alert('!'); } }} style={{ width: '100%', background: 'orange', padding: '15px', borderRadius: '15px', border: 'none', fontWeight: 'bold' }}>GİRİŞ</button>
           </div>
         </div>
       )}
 
-      {/* Uygulama Ekleme Modalı */}
       {showAddModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.95)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
           <div style={{ background: '#111', padding: '30px', borderRadius: '30px', border: '1px solid #222', width: '100%', maxWidth: '450px' }}>
-            <h3 style={{ marginBottom: '20px' }}>Yeni Uygulama Kaydı</h3>
-            <input type="text" placeholder="Uygulama Adı" style={{ width: '100%', background: '#000', border: '1px solid #222', padding: '12px', borderRadius: '10px', color: '#fff', marginBottom: '10px' }} onChange={(e) => setNewApp({...newApp, name: e.target.value})} />
-            <textarea placeholder="Açıklama" style={{ width: '100%', background: '#000', border: '1px solid #222', padding: '12px', borderRadius: '10px', color: '#fff', marginBottom: '10px', height: '80px' }} onChange={(e) => setNewApp({...newApp, description: e.target.value})} />
-            <input type="text" placeholder="Uygulama Linki (URL)" style={{ width: '100%', background: '#000', border: '1px solid #222', padding: '12px', borderRadius: '10px', color: '#fff', marginBottom: '10px' }} onChange={(e) => setNewApp({...newApp, url: e.target.value})} />
-            <input type="text" placeholder="İkon Resmi Linki" style={{ width: '100%', background: '#000', border: '1px solid #222', padding: '12px', borderRadius: '10px', color: '#fff', marginBottom: '20px' }} onChange={(e) => setNewApp({...newApp, icon_url: e.target.value})} />
+            <h3 style={{ marginBottom: '20px' }}>{t.newApp}</h3>
+            <input type="text" placeholder="Ad" style={{ width: '100%', background: '#000', border: '1px solid #222', padding: '12px', borderRadius: '10px', color: '#fff', marginBottom: '10px' }} onChange={(e) => setNewApp({...newApp, name: e.target.value})} />
+            <textarea placeholder="Açıklama" style={{ width: '100%', background: '#000', border: '1px solid #222', padding: '12px', borderRadius: '10px', color: '#fff', marginBottom: '10px' }} onChange={(e) => setNewApp({...newApp, description: e.target.value})} />
+            <input type="text" placeholder="URL" style={{ width: '100%', background: '#000', border: '1px solid #222', padding: '12px', borderRadius: '10px', color: '#fff', marginBottom: '10px' }} onChange={(e) => setNewApp({...newApp, url: e.target.value})} />
+            <input type="text" placeholder="İkon URL" style={{ width: '100%', background: '#000', border: '1px solid #222', padding: '12px', borderRadius: '10px', color: '#fff', marginBottom: '20px' }} onChange={(e) => setNewApp({...newApp, icon_url: e.target.value})} />
             <div style={{ display: 'flex', gap: '10px' }}>
-              <button onClick={() => syncApps([...apps, newApp])} style={{ flex: 1, background: 'orange', padding: '12px', borderRadius: '10px', border: 'none', fontWeight: 'bold' }}>KAYDET</button>
-              <button onClick={() => setShowAddModal(false)} style={{ flex: 1, background: '#222', padding: '12px', borderRadius: '10px', border: 'none', color: '#fff' }}>İPTAL</button>
+              <button onClick={() => syncApps([...apps, newApp])} style={{ flex: 1, background: 'orange', padding: '12px', borderRadius: '10px', border: 'none', fontWeight: 'bold' }}>{t.save}</button>
+              <button onClick={() => setShowAddModal(false)} style={{ flex: 1, background: '#222', padding: '12px', borderRadius: '10px', border: 'none', color: '#fff' }}>{t.cancel}</button>
             </div>
           </div>
         </div>
