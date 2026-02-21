@@ -18,15 +18,13 @@ const translations = {
     open: "HEMEN AÇ / YÜKLE",
     admin: "Yönetim",
     logout: "Panelden Çık",
-    banner: "Cihaza Uygulama Olarak Ekle",
     newApp: "Yeni Uygulama Ekle",
-    guide: "📲 YÜKLEME REHBERİ\n\n🤖 ANDROID:\n3 Nokta > Uygulamayı Yükle\n\n🍎 IPHONE:\nPaylaş (Yukarı Ok) > Ana Ekrana Ekle",
     save: "KAYDET",
     cancel: "İPTAL",
     modalTitle: "Uygulamayı Yükle",
     modalDesc: "Lütfen cihaz tipinizi seçerek yükleme adımlarını takip edin.",
-    androidStep: "Tarayıcınızın sağ üstündeki 3 noktaya basın ve 'Uygulamayı Yükle' seçeneğini seçin.",
-    iosStep: "Alt kısımdaki 'Paylaş' simgesine dokunun ve 'Ana Ekrana Ekle' seçeneğini seçin."
+    androidStep: "Sağ üstteki 3 noktaya basın, ardından 'Paylaş / Yayınla' seçeneğine dokunun ve listeden 'Uygulamayı Yükle'yi seçin.",
+    iosStep: "Alt kısımdaki 'Paylaş' (Yukarı Ok) simgesine dokunun ve 'Ana Ekrana Ekle' seçeneğini seçin."
   },
   ku: {
     title: "Patnos",
@@ -37,15 +35,13 @@ const translations = {
     open: "NIHA VEKE / DAXÎNE",
     admin: "Rêveberî",
     logout: "Ji Panelê Derkeve",
-    banner: "Wekî sepanê li cîhazê zêde bike",
     newApp: "Sepana Nû Zêde Bike",
-    guide: "📲 RÊBERA DAXISTINÊ\n\n🤖 ANDROID:\n3 Nuqte > Sepanê Daxîne\n\n🍎 IPHONE:\nParve bike (Tîra jor) > Li ser ekrana malê zêde bike",
     save: "BIQEIDÎNE",
     cancel: "BETAL BIKE",
     modalTitle: "Sepanê Daxîne",
     modalDesc: "Ji kerema xwe cureyê cîhaza xwe hilbijêrin.",
-    androidStep: "Li ser 3 nuqteyan bitikînin û 'Sepanê daxîne' hilbijêrin.",
-    iosStep: "Li ser nîşana 'Parve bike' bitikînin û 'Li ser ekrana malê zêde bike' hilbijêrin."
+    androidStep: "Li ser 3 nuqteyan bitikînin, 'Parve bike' hilbijêrin û paşê 'Sepanê daxîne' bitikînin.",
+    iosStep: "Li ser nîşana 'Parve bike' (Tîra jor) bitikînin û 'Li ser ekrana malê zêde bike' hilbijêrin."
   }
 };
 
@@ -65,7 +61,6 @@ const App = () => {
   const [showGuideModal, setShowGuideModal] = useState<any>(null);
   const [password, setPassword] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [showBanner, setShowBanner] = useState(true);
   const [newApp, setNewApp] = useState({ name: '', description: '', url: '', icon_url: '' });
 
   const t = translations[lang];
@@ -114,7 +109,6 @@ const App = () => {
            <p style={{ color: '#888', maxWidth: '600px', margin: '0 auto', fontSize: '15px', lineHeight: '1.6' }}>{t.desc}</p>
         </div>
 
-        {/* Arama */}
         <div style={{ display: 'flex', gap: '15px', marginBottom: '40px', alignItems: 'center', flexWrap: 'wrap' }}>
           <div style={{ flex: 1, position: 'relative', minWidth: '280px' }}>
             <Search style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)', color: '#555' }} size={20} />
@@ -132,7 +126,6 @@ const App = () => {
           )}
         </div>
 
-        {/* Kartlar */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '25px' }}>
           {filteredApps.map((app, i) => {
             const theme = cardThemes[i % cardThemes.length];
@@ -158,30 +151,30 @@ const App = () => {
         </div>
       </main>
 
-      {/* AKILLI SEÇİM MODALI (Görselindeki tasarımın aynısı) */}
+      {/* AKILLI SEÇİM MODALI */}
       {showGuideModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.95)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000 }}>
           <div style={{ background: '#fff', padding: '30px', borderRadius: '25px', width: '90%', maxWidth: '380px', color: '#000', textAlign: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '15px' }}>
               <img src={showGuideModal.icon_url} style={{ width: '40px', height: '40px', borderRadius: '10px' }} />
-              <h3 style={{ fontWeight: '900' }}>{showGuideModal.name} {t.modalTitle}</h3>
+              <h3 style={{ fontWeight: '900' }}>{showGuideModal.name}</h3>
             </div>
             
-            <p style={{ fontSize: '13px', color: '#666', marginBottom: '25px' }}>{t.modalDesc}</p>
+            <p style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', marginBottom: '20px' }}>{t.modalTitle}</p>
 
-            {/* Android Seçeneği */}
+            {/* Android */}
             <div style={{ background: '#fef3c7', padding: '15px', borderRadius: '15px', marginBottom: '15px', border: '2px solid orange', textAlign: 'left' }}>
                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                   <span style={{ fontWeight: '900', fontSize: '18px' }}>Android:</span>
-                  <button onClick={() => window.open(showGuideModal.url, '_blank')} style={{ background: '#3b82f6', color: '#fff', border: 'none', padding: '8px 20px', borderRadius: '8px', fontWeight: 'bold' }}>{t.install}</button>
+                  <button onClick={() => window.open(showGuideModal.url, '_blank')} style={{ background: '#3b82f6', color: '#fff', border: 'none', padding: '8px 20px', borderRadius: '8px', fontWeight: 'bold' }}>AÇ / YÜKLE</button>
                </div>
-               <p style={{ fontSize: '12px', color: '#444' }}>{t.androidStep}</p>
+               <p style={{ fontSize: '12px', color: '#444', lineHeight: '1.4' }}>{t.androidStep}</p>
             </div>
 
-            {/* iPhone Seçeneği */}
+            {/* iPhone */}
             <div style={{ background: '#fffbeb', padding: '15px', borderRadius: '15px', border: '1px solid #ddd', textAlign: 'left', marginBottom: '20px' }}>
-               <span style={{ fontWeight: '900', fontSize: '18px', display: 'block', marginBottom: '8px' }}>iPhone:</span>
-               <p style={{ fontSize: '12px', color: '#444' }}>{t.iosStep}</p>
+               <span style={{ fontWeight: '900', fontSize: '18px', display: 'block', marginBottom: '8px' }}>iPhone (iOS):</span>
+               <p style={{ fontSize: '12px', color: '#444', lineHeight: '1.4' }}>{t.iosStep}</p>
             </div>
 
             <button onClick={() => setShowGuideModal(null)} style={{ width: '100%', background: '#333', color: '#fff', padding: '12px', borderRadius: '12px', border: 'none', fontWeight: 'bold' }}>KAPAT</button>
@@ -189,36 +182,8 @@ const App = () => {
         </div>
       )}
 
-      {/* Admin Giriş Modalı */}
+      {/* Admin Giriş */}
       {showAdminModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.95)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ background: '#111', padding: '40px', borderRadius: '30px', border: '1px solid #222', width: '90%', maxWidth: '350px' }}>
-            <h3 style={{ color: 'orange', marginBottom: '20px', textAlign: 'center' }}>{t.admin}</h3>
-            <input type="password" placeholder="****" style={{ width: '100%', background: '#000', border: '1px solid #222', padding: '15px', borderRadius: '15px', color: '#fff', marginBottom: '15px' }} onChange={(e) => setPassword(e.target.value)} />
-            <button onClick={() => { if(password === 'Mihriban04') { setIsAdmin(true); setShowAdminModal(false); } else { alert('Hatalı Şifre!'); } }} style={{ width: '100%', background: 'orange', padding: '15px', borderRadius: '15px', border: 'none', fontWeight: 'bold' }}>GİRİŞ</button>
-          </div>
-        </div>
-      )}
-
-      {/* Yeni Uygulama Ekleme Modalı */}
-      {showAddModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.95)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
-          <div style={{ background: '#111', padding: '30px', borderRadius: '30px', border: '1px solid #222', width: '100%', maxWidth: '450px' }}>
-            <h3 style={{ marginBottom: '20px' }}>{t.newApp}</h3>
-            <input type="text" placeholder="Ad" style={{ width: '100%', background: '#000', border: '1px solid #222', padding: '12px', borderRadius: '10px', color: '#fff', marginBottom: '10px' }} onChange={(e) => setNewApp({...newApp, name: e.target.value})} />
-            <textarea placeholder="Açıklama" style={{ width: '100%', background: '#000', border: '1px solid #222', padding: '12px', borderRadius: '10px', color: '#fff', marginBottom: '10px' }} onChange={(e) => setNewApp({...newApp, description: e.target.value})} />
-            <input type="text" placeholder="Vercel Linki" style={{ width: '100%', background: '#000', border: '1px solid #222', padding: '12px', borderRadius: '10px', color: '#fff', marginBottom: '10px' }} onChange={(e) => setNewApp({...newApp, url: e.target.value})} />
-            <input type="text" placeholder="İkon URL" style={{ width: '100%', background: '#000', border: '1px solid #222', padding: '12px', borderRadius: '10px', color: '#fff', marginBottom: '20px' }} onChange={(e) => setNewApp({...newApp, icon_url: e.target.value})} />
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button onClick={() => syncApps([...apps, newApp])} style={{ flex: 1, background: 'orange', padding: '12px', borderRadius: '10px', border: 'none', fontWeight: 'bold' }}>{t.save}</button>
-              <button onClick={() => setShowAddModal(false)} style={{ flex: 1, background: '#222', padding: '12px', borderRadius: '10px', border: 'none', color: '#fff' }}>{t.cancel}</button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-const rootElement = document.getElementById('root');
-if (rootElement) { ReactDOM.createRoot(rootElement).render(<App />); }
+            <h3 style={{ color: 'orange
