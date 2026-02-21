@@ -186,4 +186,32 @@ const App = () => {
       {showAdminModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.95)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ background: '#111', padding: '40px', borderRadius: '30px', border: '1px solid #222', width: '90%', maxWidth: '350px' }}>
-            <h3 style={{ color: 'orange
+            <h3 style={{ color: 'orange', marginBottom: '20px', textAlign: 'center' }}>{t.admin}</h3>
+            <input type="password" placeholder="****" style={{ width: '100%', background: '#000', border: '1px solid #222', padding: '15px', borderRadius: '15px', color: '#fff', marginBottom: '15px' }} onChange={(e) => setPassword(e.target.value)} />
+            <button onClick={() => { if(password === 'Mihriban04') { setIsAdmin(true); setShowAdminModal(false); } else { alert('Hatalı Şifre!'); } }} style={{ width: '100%', background: 'orange', padding: '15px', borderRadius: '15px', border: 'none', fontWeight: 'bold' }}>GİRİŞ</button>
+          </div>
+        </div>
+      )}
+
+      {/* Uygulama Ekleme */}
+      {showAddModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.95)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
+          <div style={{ background: '#111', padding: '30px', borderRadius: '30px', border: '1px solid #222', width: '100%', maxWidth: '450px' }}>
+            <h3 style={{ marginBottom: '20px' }}>{t.newApp}</h3>
+            <input type="text" placeholder="Uygulama Adı" style={{ width: '100%', background: '#000', border: '1px solid #222', padding: '12px', borderRadius: '10px', color: '#fff', marginBottom: '10px' }} onChange={(e) => setNewApp({...newApp, name: e.target.value})} />
+            <textarea placeholder="Açıklama" style={{ width: '100%', background: '#000', border: '1px solid #222', padding: '12px', borderRadius: '10px', color: '#fff', marginBottom: '10px' }} onChange={(e) => setNewApp({...newApp, description: e.target.value})} />
+            <input type="text" placeholder="Vercel Linki" style={{ width: '100%', background: '#000', border: '1px solid #222', padding: '12px', borderRadius: '10px', color: '#fff', marginBottom: '10px' }} onChange={(e) => setNewApp({...newApp, url: e.target.value})} />
+            <input type="text" placeholder="İkon URL" style={{ width: '100%', background: '#000', border: '1px solid #222', padding: '12px', borderRadius: '10px', color: '#fff', marginBottom: '20px' }} onChange={(e) => setNewApp({...newApp, icon_url: e.target.value})} />
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button onClick={() => syncApps([...apps, newApp])} style={{ flex: 1, background: 'orange', padding: '12px', borderRadius: '10px', border: 'none', fontWeight: 'bold' }}>{t.save}</button>
+              <button onClick={() => setShowAddModal(false)} style={{ flex: 1, background: '#222', padding: '12px', borderRadius: '10px', border: 'none', color: '#fff' }}>{t.cancel}</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const rootElement = document.getElementById('root');
+if (rootElement) { ReactDOM.createRoot(rootElement).render(<App />); }
